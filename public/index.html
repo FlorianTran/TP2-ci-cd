@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TP CI/CD - Formulaire</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>TP CI/CD - Formulaire de soumission</h1>
+    
+    <form id="submissionForm">
+        <div>
+            <label for="name">Nom :</label>
+            <input id="name" name="name">
+        </div>
+        
+        <div>
+            <label for="email">Email :</label>
+            <input id="email" name="email">
+        </div>
+        
+        <button type="submit">Soumettre</button>
+    </form>
+    
+    <div id="message"></div>
+    
+    <div>
+        <a href="/submissions">Voir toutes les soumissions</a>
+    </div>
+
+    <script>
+        document.getElementById('submissionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                name: formData.get('name'),
+                email: formData.get('email')
+            };
+            
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('message').innerHTML = 
+                        `<div class="success">${result.message}</div>`;
+                    e.target.reset();
+                } else if (result.errors) {
+                    document.getElementById('message').innerHTML = 
+                        `<div class="error">${result.errors.join(', ')}</div>`;
+                } else if (result.error) {
+                    document.getElementById('message').innerHTML = 
+                        `<div class="error">${result.error}</div>`;
+                } else {
+                    document.getElementById('message').innerHTML = 
+                        '<div class="error">Erreur lors de la soumission</div>';
+                }
+            } catch (error) {
+                document.getElementById('message').innerHTML = 
+                    '<div class="error">Erreur lors de la soumission</div>';
+            }
+        });
+    </script>
+</body>
+</html> 
