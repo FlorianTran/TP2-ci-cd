@@ -15,8 +15,6 @@ async function query(sql, params) {
     conn = await pool.getConnection();
     const result = await conn.query(sql, params);
     return result;
-  } catch (err) {
-    throw err;
   } finally {
     if (conn) conn.release();
   }
